@@ -1,7 +1,7 @@
 app.controller("MainCtrl", function($scope, $timeout) {
 	var fs = require("fs");
-	var nodeID3 = require("node-id3");
-	var mp3Duration = require('mp3-duration');
+	var path = require("path");
+	var mm = require('music-metadata');
 	var secToMin = require('sec-to-min');
 
 	var home_path = process.env.HOME;
@@ -15,6 +15,17 @@ app.controller("MainCtrl", function($scope, $timeout) {
 	$scope.isPlay = false;
 	$scope.isPause = true;
 	$scope.loops = ["none", "all", "one"];
+
+
+	if (!localStorage.getItem("loop") || $scope.loops.indexOf(localStorage.getItem("loop")) === -1){
+		localStorage.setItem("loop", "none");
+	}
+	$scope.loop = localStorage.getItem("loop");
+
+	if (!localStorage.getItem("shuffle")){
+		localStorage.setItem("shuffle", false);
+	}
+	$scope.shuffle = localStorage.getItem("shuffle");
 
 	initMusicPath();
 
@@ -37,37 +48,39 @@ app.controller("MainCtrl", function($scope, $timeout) {
 	//     }
 	//     console.log('Path is : ' + path);
 	// });
-	fs.readdir(music_path[0], function(err, files) {
+
+	// var files = fs.readdirSync(music_path[0]);
+
+	fs.readdir(music_path[0], { duration: true }, function(err, files) {
 	    if (err) return;
 
 	    files.forEach(function(f) {
-	    	var read = nodeID3.read(music_path[0] + "/" + f);
+	    	var filePath = music_path[0] + "/" + f;
+	    	var extension = path.extname(filePath);
 
-	    	if (!read.title) {
-	    		read.title = f.toString().substring(0, f.toString().indexOf("."))
-	    	}
-	    	if (!read.artist) {
-	    		read.artist = "Unknown"
-	    	}
-	    	if (!read.album) {
-	    		read.album = "Unknown"
-	    	}
-	    	
+			var audioStream = fs.createReadStream(filePath)
 
-	    	read.path = music_path[0] + "/" + encodeURIComponent(f);
+			mm.parseStream(audioStream, {native: true}, function (err, metadata) {
+				audioStream.close();
+				if (err) throw err;
 
-	    	mp3Duration(music_path[0] + "/" + f, function (err, duration) {
-				if (err) return console.log(err.message);
+				if (!metadata.common.title) {
+					metadata.common.title = f.replace(extension, "");
+				}
 
-				read.time = secToMin(duration);
+				metadata.common.path = music_path[0] + "/" + encodeURIComponent(f);
+
+				metadata.format.duration = secToMin(metadata.format.duration);
+
+				if (metadata.format.duration.indexOf(":") === 1){
+					metadata.format.duration = "0" + metadata.format.duration;
+				}
 
 				$timeout(function() {
-					$scope.musics.push(read);
+					$scope.musics.push(metadata);
 					$scope.$apply();
 				}, 0);
 			});
-
-			console.log(read)
 	    });
 
 	    fs.closeSync(2);
@@ -79,8 +92,8 @@ app.controller("MainCtrl", function($scope, $timeout) {
 		$scope.track_title = title;
 		$scope.track_artist = artist;
 
-		if (img.type.id !== 0){
-			$scope.cover = bufferToBase64(img.imageBuffer)
+		if (img) {
+			$scope.cover = bufferToBase64(img[0].data);
 			$scope.showCover = true;
 		}else {
 			$scope.showCover = false;
@@ -104,6 +117,8 @@ app.controller("MainCtrl", function($scope, $timeout) {
 	}
 
 	$scope.nextSong =function(isLoop, isShuffle) {
+		console.log(isLoop, isShuffle);
+
 		var index;
 
 		if ($scope.current >= $scope.musics.length - 1) {
@@ -153,6 +168,29 @@ app.controller("MainCtrl", function($scope, $timeout) {
 		$scope.isPlay = false;
 		$scope.isPause = true;
 		$(".cover").css("animation-play-state", "paused");
+	}
+
+	$scope.loopFunction = function(){
+		var index = $scope.loops.indexOf($scope.loop);
+
+		if (index === 2){
+			index = -1;
+		}
+		
+		$scope.loop = $scope.loops[index+1];
+
+
+		localStorage.setItem("loop", $scope.loop);
+	}
+
+	$scope.shuffleFunction = function(){
+		if (JSON.parse($scope.shuffle)){
+			localStorage.setItem("shuffle", false);
+		}else{
+			localStorage.setItem("shuffle", true);
+		}
+
+		$scope.shuffle = localStorage.getItem("shuffle");
 	}
 
 	myMedia.addEventListener("ended", function(){

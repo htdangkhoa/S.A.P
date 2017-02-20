@@ -130,13 +130,14 @@ body {
         display: flex; }
         .main-content .info .controls .control div i {
           cursor: pointer; }
+        .main-content .info .controls .control .loop-or-shuffle {
+          color: #459ce7; }
       .main-content .info .controls .control1 div {
         width: 33.33%; }
       .main-content .info .controls .control2 div {
         top: 65px;
         position: absolute; }
         .main-content .info .controls .control2 div #repeat-one {
-          color: #FFF;
           position: absolute;
           top: 10px;
           right: 12px;
