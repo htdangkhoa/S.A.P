@@ -4,7 +4,7 @@ myMedia.id = "audio-player";
 // myMedia.setAttribute('controls', 'true');
 
 if (!localStorage.getItem("volume") || isNaN(localStorage.getItem("volume"))){
-	localStorage.setItem("volume", 30);
+	localStorage.setItem("volume", 50);
 }
 
 $("#volume-duration").slider({
