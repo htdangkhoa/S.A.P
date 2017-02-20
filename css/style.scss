@@ -13,6 +13,11 @@ $selected: #459ce7;
 	}
 
 	font-size: 16px;
+
+	-webkit-user-select: none;  
+	-moz-user-select: none;    
+	-ms-user-select: none;      
+	user-select: none;
 }
 
 body {
@@ -78,12 +83,13 @@ body {
 
 .slider-bar {
 	position: absolute;
-    left: 12.5%;
-    top: -30px;
+    top: -27px !important;
     height: 5px;
-    width: 75%;
     background: #888;
     border-radius: 15px;
+    width: 68%;
+    left: 16%;
+    
 	
 	.ui-slider-range-min {
 		height: 5px;
@@ -109,9 +115,29 @@ body {
 	}
 }
 
-.slider-bar:hover {
+#seek-duration {
+	.ui-slider-range-min {
+		top: 0px;
+	}
+
+	.ui-slider-handle {
+		top: 0pc;
+	}
+}
+
+#seek-duration:hover {
 	.ui-slider-handle {
 		display: block;
+	}
+}
+
+#volume-duration {
+	top: 85px !important;
+    height: 1px;
+
+    .ui-slider-handle {
+		display: block;
+		margin-top: -7px;
 	}
 }
 
@@ -134,8 +160,8 @@ body {
 		
 
 		.cover {
-			width: 300px;
-			height: 300px;
+			width: 250px;
+			height: 250px;
 			border-radius: 50%;
 		    border: 1px solid #666;
 		    padding: 25px 12px 0px 12px;
@@ -143,7 +169,7 @@ body {
 		    margin-top: 50px;
 
 		    i {
-		    	font-size: 250px;
+		    	font-size: 200px;
 		    	line-height: 0px;
 		    }
 
@@ -182,7 +208,7 @@ body {
 		.track-info {
 			color: $white;
 			padding: 0px 40px;
-			margin-top: 50px;
+			margin-top: 30px;
 
 			h3, p {
 				overflow: hidden;
@@ -191,14 +217,27 @@ body {
 			}
 
 			p {
-				margin-top: 20px;
+				margin-top: 10px;
 			}
 		}
 
 		.controls {
 			position: absolute;
 		    width: 100%;
-		    bottom: 30px;
+		    bottom: 80px;
+
+		    .duration {
+		    	color: $white;
+
+		    	.time {
+		    		position: absolute;
+		    		top: -35px;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+					width: 45px;
+		    	}
+		    }
 
 		    .control {
 		    	display: flex;
@@ -209,11 +248,20 @@ body {
 		    }
 
 		    .control1 div {
-		    	width: 50%;
+		    	width: 33.33%;
 		    }
 
 		    .control2 div {
-		    	width: 33.33%;
+		    	top: 65px;
+		    	position: absolute;
+
+		    	#repeat-one {
+		    		color: $white;
+					position: absolute;
+					top: 10px;
+					right: 12px;
+					cursor: pointer;
+		    	}
 		    }
 		}
 	}

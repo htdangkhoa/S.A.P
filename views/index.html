@@ -49,7 +49,7 @@
 			<div class="tracks-list-body">
 				<div class="tracks-list-tiles">
 					<div class="tracks-list-tile">
-						<div class="track" ng-class="$index % 2 === 0 ? 'track-pear' : 'track-foot' " ng-repeat="music in musics" ng-click="playSong( $index, music.path, music.title, music.artist, music.image )">
+						<div class="track" ng-class="$index % 2 === 0 ? 'track-pear' : 'track-foot' " ng-repeat="music in musics" ng-click="playSong( $index, music.path, music.title, music.artist, music.image, music.time )">
 							<div class="cell cell-track-playing text-center">{{ $index + 1 }}</div>
 							<div class="cell cell-track">{{ music.title }}</div>
 							<div class="cell cell-duration">{{ music.time }}</div>
@@ -63,11 +63,11 @@
 
 		<div class="info">
 			<center>
-				<div class="cover" ng-class="current !== undefined ? 'spinning' : ''" ng-show="showCover" style="padding: 0px;">
-					<img width="300" height="300" src="{{ cover }}">
+				<div class="cover" ng-class="current !== undefined ? 'spinning' : ''" ng-show="showCover" style="padding: 0px; animation-play-state: paused;">
+					<img width="250" height="250" src="{{ cover }}">
 					<!-- <div></div> -->
 				</div>
-				<div class="cover" ng-class="current !== undefined ? 'spinning' : ''" ng-hide="showCover">
+				<div class="cover" ng-class="current !== undefined ? 'spinning' : ''" ng-hide="showCover" style="animation-play-state: paused;">
 					<i class="icon ion-ios-musical-notes"></i>
 				</div>
 				<div class="track-info">
@@ -76,27 +76,36 @@
 				</div>
 
 				<div class="controls" id="player">
-					<div class="slider-bar" id="seek-duration"></div>
-					<!-- <div class="control control1">
+					
+					<div class="duration">
+						<span class="time" style="left: 10px;">{{ durationFrom || '00:00' }}</span>
+						<div class="slider-bar" id="seek-duration"></div>
+						<span class="time" style="right: 10px;">{{ durationTo || '00:00' }}</span>
+					</div>
+
+					<div class="control control1">
 						<div>
-							<i class="icon ion-ios-shuffle-strong"></i>
-						</div>
-						<div>
-							<i class="icon ion-ios-infinite"></i>
-						</div>
-					</div> -->
-					<div class="control control2">
-						<div ng-click="previousSong()">
-							<i class="icon ion-ios-rewind"></i>
+							<i class="icon ion-ios-rewind" title="Previous" ng-click="previousSong()"></i>
 						</div>
 						<div ng-hide="isPlay">
-							<i class="icon ion-ios-play" ng-click="play()"></i>
+							<i class="icon ion-ios-play" title="Play" ng-click="play()"></i>
 						</div>
 						<div ng-hide="isPause">
-							<i class="icon ion-ios-pause" ng-click="pause()"></i>
+							<i class="icon ion-ios-pause" title="Pause" ng-click="pause()"></i>
 						</div>
-						<div ng-click="nextSong()">
-							<i class="icon ion-ios-fastforward"></i>
+						<div>
+							<i class="icon ion-ios-fastforward" title="Next" ng-click="nextSong()"></i>
+						</div>
+					</div>
+
+					<div class="control control2">
+						<div style="left: 10px;">
+							<i class="icon ion-ios-shuffle-strong" title="Shuffle"></i>
+						</div>
+						<div class="slider-bar" id="volume-duration"></div>
+						<div style="right: 10px;">
+							<i class="icon ion-ios-loop-strong" title="Repeat"></i>
+							<span id="repeat-one">1</span>
 						</div>
 					</div>
 					<!-- <i class="icon ion-ios-rewind" style="margin-left: 8px;"></i>

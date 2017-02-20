@@ -14,6 +14,7 @@ app.controller("MainCtrl", function($scope, $timeout) {
 	$scope.current;
 	$scope.isPlay = false;
 	$scope.isPause = true;
+	$scope.loops = ["none", "all", "one"];
 
 	initMusicPath();
 
@@ -72,7 +73,7 @@ app.controller("MainCtrl", function($scope, $timeout) {
 	    fs.closeSync(2);
 	});
 
-	$scope.playSong = function(index, path, title, artist, img){
+	$scope.playSong = function(index, path, title, artist, img, time){
 		$(".selected").removeClass("selected")
 		
 		$scope.track_title = title;
@@ -85,7 +86,7 @@ app.controller("MainCtrl", function($scope, $timeout) {
 			$scope.showCover = false;
 		}
 
-		playAudio(path.toString(), 0.5);
+		playAudio(path.toString(), ($('#volume-duration').slider("option").value / 100));
 
 		$scope.current = index;
 
@@ -93,12 +94,17 @@ app.controller("MainCtrl", function($scope, $timeout) {
 		$scope.isPause = false;
 
 		$($(".track")[index]).addClass("selected");
+		$(".cover").css("animation-play-state", "running");
+
+		$scope.durationTo = time;
+
+		if ($scope.durationTo.indexOf(":") === 1){
+			$scope.durationTo = "0" + $scope.durationTo;
+		}
 	}
 
 	$scope.nextSong =function(isLoop, isShuffle) {
 		var index;
-
-		// $($(".track")[$scope.current]).removeClass("selected");
 
 		if ($scope.current >= $scope.musics.length - 1) {
 			index = 0;
@@ -110,14 +116,13 @@ app.controller("MainCtrl", function($scope, $timeout) {
 		var title = $scope.musics[index].title;
 		var artist = $scope.musics[index].artist;
 		var img = $scope.musics[index].image;
+		var time = $scope.musics[index].time;
 
-		$scope.playSong(index, path, title, artist, img);
+		$scope.playSong(index, path, title, artist, img, time);
 	}
 
 	$scope.previousSong =function(isLoop, isShuffle) {
 		var index;
-
-		// $($(".track")[$scope.current]).removeClass("selected");
 
 		if ($scope.current <= 0) {
 			index = $scope.musics.length - 1;
@@ -129,8 +134,9 @@ app.controller("MainCtrl", function($scope, $timeout) {
 		var title = $scope.musics[index].title;
 		var artist = $scope.musics[index].artist;
 		var img = $scope.musics[index].image;
+		var time = $scope.musics[index].time;
 
-		$scope.playSong(index, path, title, artist, img);
+		$scope.playSong(index, path, title, artist, img, time);
 	}
 
 	$scope.play = function(){
@@ -138,6 +144,7 @@ app.controller("MainCtrl", function($scope, $timeout) {
 			myMedia.play();
 			$scope.isPlay = true;
 			$scope.isPause = false;
+			$(".cover").css("animation-play-state", "running");
 		}
 	}
 
@@ -145,6 +152,7 @@ app.controller("MainCtrl", function($scope, $timeout) {
 		myMedia.pause();
 		$scope.isPlay = false;
 		$scope.isPause = true;
+		$(".cover").css("animation-play-state", "paused");
 	}
 
 	myMedia.addEventListener("ended", function(){
@@ -153,7 +161,26 @@ app.controller("MainCtrl", function($scope, $timeout) {
 		}, 0);
 	})
 
+	myMedia.addEventListener('timeupdate', function(){
+		// console.log($("#audio-player")[0].currentTime);
+		$("#seek-duration").slider({
+			min: 0,
+			max: $("#audio-player")[0].duration,
+			value: $("#audio-player")[0].currentTime,
+			range: "min",
+			slide: function(event, ui) {
+				// console.log(ui.value/100);
+				$("#audio-player")[0].currentTime = ui.value;
+			}
+		})
 
+		$timeout(function() {
+			$scope.durationFrom = secToMin($("#audio-player")[0].currentTime);
+			if ($scope.durationFrom.indexOf(":") === 1){
+				$scope.durationFrom = "0" + $scope.durationFrom;
+			}
+		}, 0);
+	});
 
 	function bufferToBase64(buf) {
 	    var binstr = Array.prototype.map.call(buf, function (ch) {

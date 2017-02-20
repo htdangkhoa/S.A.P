@@ -3,6 +3,19 @@ $('.controls').append(myMedia);
 myMedia.id = "audio-player";
 // myMedia.setAttribute('controls', 'true');
 
+if (!localStorage.getItem("volume") || isNaN(localStorage.getItem("volume"))){
+	localStorage.setItem("volume", 30);
+}
+
+$("#volume-duration").slider({
+	min: 0,
+	max: 100,
+	value: localStorage.getItem("volume"),
+	slide: function(event, ui) {
+		setVolume(ui.value / 100);
+	}
+})
+
 function playAudio(fileName, myVolume) {
 	myMedia.src = fileName;
 	// myMedia.setAttribute('loop', 'loop');
@@ -14,19 +27,5 @@ function playAudio(fileName, myVolume) {
 function setVolume(myVolume) {
 	var myMedia = document.getElementById('audio-player');
 	myMedia.volume = myVolume;
+	localStorage.setItem("volume", (myVolume * 100))
 }
-
-
-myMedia.addEventListener('timeupdate', function(){
-	// console.log($("#audio-player")[0].currentTime);
-	$("#seek-duration").slider({
-		min: 0,
-		max: $("#audio-player")[0].duration,
-		value: $("#audio-player")[0].currentTime,
-		range: "min",
-		slide: function(event, ui) {
-			// console.log(ui.value/100);
-			$("#audio-player")[0].currentTime = ui.value;
-		}
-	})
-});
