@@ -21,10 +21,9 @@ $ npm install && npm start
   
 ### Building
 ```
-$ npm install
 $ sudo npm install -g electron-packager
-$ npm install electron-prebuilt
-$ npm run-script build
+$ npm install
+$ npm run build
 ```
 
   
