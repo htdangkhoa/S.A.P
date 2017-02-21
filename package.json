@@ -4,8 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "build": "electron-packager ./ 'S.A.P - Simple Audio Player' --platform=linux --out ./build --version 1.0.0"
+    "start": "electron ."
   },
   "author": "",
   "license": "ISC",
