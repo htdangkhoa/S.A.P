@@ -4,15 +4,29 @@ S.A.P - Simple Audio Player
 ## Screenshot
 ![screenshot](https://github.com/htdangkhoa/S.A.P/blob/master/screenshots/1.png)
 
-## Building
-Project requires:  
+## Require:  
   - [Node.js](https://nodejs.org/) version 4 or higher
   - [Electron framework](http://electron.atom.io/)
+
+## Development
 ```
 $ git clone https://github.com/htdangkhoa/S.A.P.git
 $ cd S.A.P
+```
+  
+### Running
+```
 $ npm install && npm start
 ```
+  
+### Building
+```
+$ npm install
+$ sudo npm install -g electron-packager
+$ npm install electron-prebuilt
+$ electron-packager <source_dir> <appname> --platform=<platform> --out <build_directory> --version 1.0.0
+```
 
+  
 ## License
 [MIT](https://github.com/htdangkhoa/S.A.P/blob/master/LICENSE)
