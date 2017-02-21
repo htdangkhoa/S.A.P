@@ -24,7 +24,7 @@ $ npm install && npm start
 $ npm install
 $ sudo npm install -g electron-packager
 $ npm install electron-prebuilt
-$ electron-packager <source_dir> <appname> --platform=<platform> --out <build_directory> --version 1.0.0
+$ npm run-script build
 ```
 
   
