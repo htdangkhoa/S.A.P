@@ -20,7 +20,12 @@ app.on("ready", function() {
 
 	//win.webContents.openDevTools();
 
-	win.on('closed', function() {
+	win.on("closed", function() {
 		win = null
 	});
+})
+
+
+app.on("window-all-closed", function() {
+	app.quit();
 })
