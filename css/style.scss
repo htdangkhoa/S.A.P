@@ -83,6 +83,10 @@ body {
 // 	}
 // }
 
+.selected {
+	background-color: $selected;
+}
+
 .slider-bar {
 	position: absolute;
     top: -27px !important;
@@ -166,6 +170,11 @@ body {
 			position: absolute;
 			left: 0px;
 			padding-left: 15px;
+			padding-top: 8px;
+
+			i {
+				cursor: pointer;
+			}
 		}
 
 		.header-center {
@@ -191,6 +200,7 @@ body {
 					text-overflow: ellipsis;
 					white-space: nowrap;
 					border-right: 1px solid $white;
+					cursor: pointer;
 				}
 			}
 		}
@@ -216,7 +226,7 @@ body {
 	.info {
 		width: 30%;
 		max-width: 400px;
-		height: calc(100% - 60px);
+		height: calc(100% - 95px);
 		background-color: $pear;
 		position: absolute;
 		right: 0px;
@@ -373,6 +383,7 @@ body {
 			border-top: 1px solid #000;
 			text-align: center;
 			color: $white;
+			position: absolute;
 
 			p {
 				margin: 0px;
@@ -406,10 +417,6 @@ body {
 						    overflow: hidden;
 						    text-overflow: ellipsis;
 						}
-					}
-
-					.selected {
-						background-color: $selected;
 					}
 
 					.track-foot {

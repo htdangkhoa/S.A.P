@@ -41,16 +41,18 @@
 
 		<div class="header-bar">
 			<div class="header-left">
-				<h2 style="margin-top: 5px; font-size: 35px;">S.A.P</h2>
-				<p style="margin-top: -15px; font-size: 10px;">Simple Audio Player</p>
+				<!-- <h2 style="margin-top: 5px; font-size: 35px;">S.A.P</h2>
+				<p style="margin-top: -15px; font-size: 10px;">Simple Audio Player</p> -->
+
+				<i class="icon ion-navicon"></i>
 			</div>
 			<div class="header-center">
 
 				<div class="sort-buttons">
-					<div class="sort-button">Song</div>
-					<div class="sort-button">Time</div>
-					<div class="sort-button">Artist</div>
-					<div class="sort-button" style="border-right: none;">Album</div>
+					<div class="sort-button selected" ng-click="changeSort('song')">Song</div>
+					<div class="sort-button" ng-click="changeSort('time')">Time</div>
+					<div class="sort-button" ng-click="changeSort('artist')">Artist</div>
+					<div class="sort-button" ng-click="changeSort('album')" style="border-right: none;">Album</div>
 				</div>
 			</div>
 			<div class="header-right">
@@ -70,7 +72,7 @@
 			<div class="tracks-list-body">
 				<div class="tracks-list-tiles">
 					<div class="tracks-list-tile">
-						<div class="track" ng-class="$index % 2 === 0 ? 'track-pear' : 'track-foot' " ng-repeat="music in musics" ng-click="playSong( $index, music.common.path, music.common.title, music.common.artists[0], music['id3v2.3'], music.format.duration )">
+						<div class="track" ng-class="$index % 2 === 0 ? 'track-pear' : 'track-foot' " ng-repeat="music in musics | orderBy: sort" ng-click="playSong( $index, music.common.path, music.common.title, music.common.artists[0], music['id3v2.3'], music.format.duration )">
 							<div class="cell cell-track-playing text-center">{{ $index + 1 }}</div>
 							<div class="cell cell-track">{{ music.common.title }}</div>
 							<div class="cell cell-duration">{{ music.format.duration || '00:00' }}</div>

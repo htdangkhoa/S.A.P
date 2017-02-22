@@ -12,6 +12,9 @@
 body {
   overflow: hidden; }
 
+.selected {
+  background-color: #459ce7; }
+
 .slider-bar {
   position: absolute;
   top: -27px !important;
@@ -74,7 +77,10 @@ body {
       color: #FFF;
       position: absolute;
       left: 0px;
-      padding-left: 15px; }
+      padding-left: 15px;
+      padding-top: 8px; }
+      .main-content .header-bar .header-left i {
+        cursor: pointer; }
     .main-content .header-bar .header-center {
       width: 70%;
       height: 100%;
@@ -95,7 +101,8 @@ body {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
-          border-right: 1px solid #FFF; }
+          border-right: 1px solid #FFF;
+          cursor: pointer; }
     .main-content .header-bar .header-right {
       width: 15%;
       height: 100%;
@@ -112,7 +119,7 @@ body {
   .main-content .info {
     width: 30%;
     max-width: 400px;
-    height: calc(100% - 60px);
+    height: calc(100% - 95px);
     background-color: #4d4d4d;
     position: absolute;
     right: 0px;
@@ -222,7 +229,8 @@ body {
       background-color: #444;
       border-top: 1px solid #000;
       text-align: center;
-      color: #FFF; }
+      color: #FFF;
+      position: absolute; }
       .main-content .list .footer-bar p {
         margin: 0px;
         margin-top: 6px; }
@@ -247,8 +255,6 @@ body {
               white-space: nowrap;
               overflow: hidden;
               text-overflow: ellipsis; }
-          .main-content .list .tracks-list-body .tracks-list-tiles .tracks-list-tile .selected {
-            background-color: #459ce7; }
           .main-content .list .tracks-list-body .tracks-list-tiles .tracks-list-tile .track-foot {
             background-color: #444; }
           .main-content .list .tracks-list-body .tracks-list-tiles .tracks-list-tile .track-pear {

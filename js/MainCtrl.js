@@ -1,4 +1,4 @@
-app.controller("MainCtrl", function($scope, $timeout) {
+app.controller("MainCtrl", function($scope, $timeout, $filter) {
 	var fs = require("fs");
 	var _path = require("path");
 	var mm = require("music-metadata");
@@ -22,6 +22,7 @@ app.controller("MainCtrl", function($scope, $timeout) {
 	$scope.total_songs = 0;
 	$scope.total_time = "00:00";
 	var totalTime = 0;
+	$scope.sort = "common.title";
 
 
 	if (!localStorage.getItem("loop") || $scope.loops.indexOf(localStorage.getItem("loop")) === -1){
@@ -335,6 +336,31 @@ app.controller("MainCtrl", function($scope, $timeout) {
 		console.log(list_random[list_random.length-1])
 
 		return list_random[list_random.length-1];
+	}
+
+	$scope.changeSort = function(mode) {
+		$(".sort-button").removeClass("selected");
+		if (mode === "time"){
+			$timeout(function() {
+				$($(".sort-button")[1]).addClass("selected");
+			}, 0);
+			$scope.sort = "format.duration";
+		}else if (mode === "artist") {
+			$timeout(function() {
+				$($(".sort-button")[2]).addClass("selected");
+			}, 0);
+			$scope.sort = "common.artists[0]";
+		}else if (mode === "album") {
+			$timeout(function() {
+				$($(".sort-button")[3]).addClass("selected");
+			}, 0);
+			$scope.sort = "common.album";
+		}else {
+			$timeout(function() {
+				$($(".sort-button")[0]).addClass("selected");
+			}, 0);
+			$scope.sort = "common.title";
+		}
 	}
 
 	function bufferToBase64(buf) {
