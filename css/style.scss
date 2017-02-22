@@ -18,6 +18,8 @@ $selected: #459ce7;
 	-moz-user-select: none;    
 	-ms-user-select: none;      
 	user-select: none;
+
+	outline: none;
 }
 
 body {
@@ -149,14 +151,76 @@ body {
 	overflow-y: auto;
 	display: flex;
 
+	.header-bar {
+		height: 60px;
+		width: 100%;
+		position: absolute;
+		display: flex;
+		border-bottom: 1px solid #000;
+
+		.header-left {
+			width: 15%;
+			height: 100%;
+			background-color: $main-color;
+			color: $white;
+			position: absolute;
+			left: 0px;
+			padding-left: 15px;
+		}
+
+		.header-center {
+			width: 70%;
+			height: 100%;
+			background-color: $main-color;
+			position: absolute;
+			left: 15%;
+			text-align: center;
+			padding: 0px 15%;
+
+			.sort-buttons {
+				border: 1px solid $white;
+				display: flex;
+				margin-top: 13px;
+				color: $white;
+
+				.sort-button {
+					width: 25%;
+					height: 30px;
+					padding-top: 5px;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+					border-right: 1px solid $white;
+				}
+			}
+		}
+
+		.header-right {
+			width: 15%;
+			height: 100%;
+			background-color: $main-color;
+			position: absolute;
+			right: 0px;
+			padding: 0px 15px;
+
+			input {
+				width: 100%;
+				margin-top: 18px;
+				border-radius: 15px;
+				border: none;
+				padding: 0px 12px;
+			}
+		}
+	}
+
 	.info {
 		width: 30%;
 		max-width: 400px;
-		height: 100%;
+		height: calc(100% - 60px);
 		background-color: $pear;
 		position: absolute;
 		right: 0px;
-
+		top: 60px;
 		
 
 		.cover {
@@ -303,10 +367,23 @@ body {
 			}
 		}
 
+		.footer-bar {
+			width: 100%;
+			background-color: $main-color;
+			border-top: 1px solid #000;
+			text-align: center;
+			color: $white;
+
+			p {
+				margin: 0px;
+				margin-top: 6px;
+			}
+		}
+
 		.tracks-list-body {
 		    height: calc(100% - 30px);
-		    max-height: calc(100% - 30px);
-		    margin-top: 30px;
+		    max-height: calc(100% - 95px);
+		    margin-top: 60px;
 		    overflow: auto;
 
 		    .tracks-list-tiles {

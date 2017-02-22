@@ -3,7 +3,8 @@
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  user-select: none; }
+  user-select: none;
+  outline: none; }
   * i {
     font-size: 32px;
     color: #FFF; }
@@ -60,13 +61,62 @@ body {
   background-color: #444;
   overflow-y: auto;
   display: flex; }
+  .main-content .header-bar {
+    height: 60px;
+    width: 100%;
+    position: absolute;
+    display: flex;
+    border-bottom: 1px solid #000; }
+    .main-content .header-bar .header-left {
+      width: 15%;
+      height: 100%;
+      background-color: #444;
+      color: #FFF;
+      position: absolute;
+      left: 0px;
+      padding-left: 15px; }
+    .main-content .header-bar .header-center {
+      width: 70%;
+      height: 100%;
+      background-color: #444;
+      position: absolute;
+      left: 15%;
+      text-align: center;
+      padding: 0px 15%; }
+      .main-content .header-bar .header-center .sort-buttons {
+        border: 1px solid #FFF;
+        display: flex;
+        margin-top: 13px;
+        color: #FFF; }
+        .main-content .header-bar .header-center .sort-buttons .sort-button {
+          width: 25%;
+          height: 30px;
+          padding-top: 5px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          border-right: 1px solid #FFF; }
+    .main-content .header-bar .header-right {
+      width: 15%;
+      height: 100%;
+      background-color: #444;
+      position: absolute;
+      right: 0px;
+      padding: 0px 15px; }
+      .main-content .header-bar .header-right input {
+        width: 100%;
+        margin-top: 18px;
+        border-radius: 15px;
+        border: none;
+        padding: 0px 12px; }
   .main-content .info {
     width: 30%;
     max-width: 400px;
-    height: 100%;
+    height: calc(100% - 60px);
     background-color: #4d4d4d;
     position: absolute;
-    right: 0px; }
+    right: 0px;
+    top: 60px; }
     .main-content .info .cover {
       width: 250px;
       height: 250px;
@@ -167,10 +217,19 @@ body {
         border-right: 1px solid #ccc; }
       .main-content .list .tracks-list-header .track-cell-header:last-child {
         margin-right: 4px; }
+    .main-content .list .footer-bar {
+      width: 100%;
+      background-color: #444;
+      border-top: 1px solid #000;
+      text-align: center;
+      color: #FFF; }
+      .main-content .list .footer-bar p {
+        margin: 0px;
+        margin-top: 6px; }
     .main-content .list .tracks-list-body {
       height: calc(100% - 30px);
-      max-height: calc(100% - 30px);
-      margin-top: 30px;
+      max-height: calc(100% - 95px);
+      margin-top: 60px;
       overflow: auto; }
       .main-content .list .tracks-list-body .tracks-list-tiles {
         position: relative; }
