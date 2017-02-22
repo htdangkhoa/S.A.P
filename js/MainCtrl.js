@@ -3,6 +3,8 @@ app.controller("MainCtrl", function($scope, $timeout) {
 	var _path = require("path");
 	var mm = require("music-metadata");
 	var secToMin = require("sec-to-min");
+	var ytdl = require("youtube-dl");
+	var downloader = require('../node_modules/youtube-dl/lib/downloader');
 
 	var home_path = process.env.HOME;
 	process.env.MUSIC = JSON.stringify([]);
@@ -17,6 +19,9 @@ app.controller("MainCtrl", function($scope, $timeout) {
 	$scope.isPlay = false;
 	$scope.isPause = true;
 	$scope.loops = ["none", "all", "one"];
+	$scope.total_songs = 0;
+	$scope.total_time = "00:00";
+	var totalTime = 0;
 
 
 	if (!localStorage.getItem("loop") || $scope.loops.indexOf(localStorage.getItem("loop")) === -1){
@@ -63,37 +68,54 @@ app.controller("MainCtrl", function($scope, $timeout) {
 	    	var filePath = music_path[0] + "/" + f;
 	    	var extension = _path.extname(filePath);
 
-			var audioStream = fs.createReadStream(filePath)
+	    	if (extension === ".mp3" || extension === ".ogg" || extension === ".wav") {
+	    		var audioStream = fs.createReadStream(filePath)
 
-			mm.parseStream(audioStream, {native: true}, function (err, metadata) {
-				audioStream.close();
-				if (err) throw err;
+				mm.parseStream(audioStream, {native: true}, function (err, metadata) {
+					audioStream.close();
+					if (err) throw err;
 
-				if (!metadata.common.title) {
-					metadata.common.title = f.replace(extension, "");
-				}
+					if (!metadata.common.title) {
+						metadata.common.title = f.replace(extension, "");
+					}
 
-				if (!metadata.common.artists[0]) {
-					metadata.common.artists[0] = "Unknown";
-				}
+					if (!metadata.common.artists[0]) {
+						metadata.common.artists[0] = "Unknown";
+					}
 
-				if (!metadata.common.album) {
-					metadata.common.album = "Unknown";
-				}
+					if (!metadata.common.album) {
+						metadata.common.album = "Unknown";
+					}
 
-				metadata.common.path = music_path[0] + "/" + encodeURIComponent(f);
+					metadata.common.path = music_path[0] + "/" + encodeURIComponent(f);
 
-				metadata.format.duration = secToMin(metadata.format.duration);
+					totalTime += parseFloat(metadata.format.duration);
 
-				if (metadata.format.duration.indexOf(":") === 1){
-					metadata.format.duration = "0" + metadata.format.duration;
-				}
+					if (secToMin(totalTime).indexOf(":") === 1){
+						$scope.total_time = "0" + secToMin(totalTime);
+					}else {
+						$scope.total_time = secToMin(totalTime);
+					}
 
-				$timeout(function() {
-					$scope.musics.push(metadata);
-					$scope.$apply();
-				}, 0);
-			});
+					if (parseInt($scope.total_time.substring(0, $scope.total_time.indexOf(":"))) <= 1){
+						$scope.minutes = false;
+					}else {
+						$scope.minutes = true;
+					}
+					
+					metadata.format.duration = secToMin(metadata.format.duration);
+
+					if (metadata.format.duration.indexOf(":") === 1){
+						metadata.format.duration = "0" + metadata.format.duration;
+					}
+
+					$timeout(function() {
+						$scope.musics.push(metadata);
+						$scope.$apply();
+						$scope.total_songs = $scope.musics.length;
+					}, 0);
+				});
+	    	}
 	    });
 
 	    fs.closeSync(2);
@@ -320,5 +342,19 @@ app.controller("MainCtrl", function($scope, $timeout) {
 	        return String.fromCharCode(ch);
 	    }).join('');
 	    return "data:image/png;base64," + btoa(binstr);
+	}
+
+	$scope.yt = function(){
+		var url = 'https://www.youtube.com/watch?v=H7HmzwI67ec';
+		ytdl.exec(url, ['-x', '--audio-format', 'mp3'], {}, function(err, output) {
+		  if (err) throw err;
+		  console.log(output.join('\n'));
+		});
+
+		downloader(__dirname + '/Owl City & Carly Rae Jepsen - Good Time-H7HmzwI67ec.mp3', function error(err, done) {
+		  'use strict';
+		  if (err) { return console.log(err.stack); }
+		  console.log(done);
+		});
 	}
 });

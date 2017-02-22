@@ -6,8 +6,8 @@ let win;
 
 app.on("ready", function() {
 	win = new BrowserWindow({
-		width: 1200,
-		height: 720,
+		width: 1500,
+		height: 920,
 		minWidth: 1200,
 		minHeight: 720
 	});
@@ -18,7 +18,7 @@ app.on("ready", function() {
 		slashes: true
 	}));
 
-	//win.webContents.openDevTools();
+	win.webContents.openDevTools();
 
 	win.on("closed", function() {
 		win = null

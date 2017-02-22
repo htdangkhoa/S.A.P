@@ -39,14 +39,33 @@
 			<div class="table-header-album">Album</div>
 		</div> -->
 
+		<div class="header-bar">
+			<div class="header-left">
+				<h2 style="margin-top: 5px; font-size: 35px;">S.A.P</h2>
+				<p style="margin-top: -15px; font-size: 10px;">Simple Audio Player</p>
+			</div>
+			<div class="header-center">
+
+				<div class="sort-buttons">
+					<div class="sort-button">Song</div>
+					<div class="sort-button">Time</div>
+					<div class="sort-button">Artist</div>
+					<div class="sort-button" style="border-right: none;">Album</div>
+				</div>
+			</div>
+			<div class="header-right">
+				<input type="text" placeholder="Search">
+			</div>
+		</div>
+
 		<div class="list">
-			<div class="tracks-list-header">
+			<!-- <div class="tracks-list-header">
 				<div class="track-cell-header cell-track-playing"></div>
 				<div class="track-cell-header cell-track">Track</div>
 				<div class="track-cell-header cell-duration">Time</div>
 				<div class="track-cell-header cell-artist">Artist</div>
 				<div class="track-cell-header cell-album">Album</div>
-			</div>
+			</div> -->
 
 			<div class="tracks-list-body">
 				<div class="tracks-list-tiles">
@@ -61,6 +80,10 @@
 					</div>
 				</div>
 			</div>
+
+			<div class="footer-bar">
+				<p>{{total_songs}} {{total_songs > 1 ?  'songs' : 'song'}}, {{total_time}} {{minutes ? 'minutes' : 'minute'}}</p>
+			</div>
 		</div>
 
 		<div class="info">
@@ -69,7 +92,7 @@
 					<img width="250" height="250" src="{{ cover }}">
 					<!-- <div></div> -->
 				</div>
-				<div class="cover" ng-class="current !== undefined ? 'spinning' : ''" ng-hide="showCover" style="animation-play-state: paused;">
+				<div ng-click="yt()" class="cover" ng-class="current !== undefined ? 'spinning' : ''" ng-hide="showCover" style="animation-play-state: paused;">
 					<i class="icon ion-ios-musical-notes"></i>
 				</div>
 				<div class="track-info">
@@ -78,7 +101,7 @@
 				</div>
 
 				<div class="controls" id="player">
-					
+
 					<div class="duration">
 						<span class="time" style="left: 10px;">{{ durationFrom || '00:00' }}</span>
 						<div class="slider-bar" id="seek-duration"></div>
