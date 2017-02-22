@@ -113,6 +113,7 @@ app.controller("MainCtrl", function($scope, $timeout, $filter) {
 					$timeout(function() {
 						$scope.musics.push(metadata);
 						$scope.$apply();
+						$scope.musics = $filter("orderBy")($scope.musics, $scope.sort);
 						$scope.total_songs = $scope.musics.length;
 					}, 0);
 				});
@@ -123,7 +124,7 @@ app.controller("MainCtrl", function($scope, $timeout, $filter) {
 	});
 
 	$scope.playSong = function(index, path, title, artist, img, time){
-		$(".selected").removeClass("selected");
+		$(".track").removeClass("selected");
 
 		$(".cover").each(function(){
 			$(this).addClass("spinning");
@@ -361,6 +362,8 @@ app.controller("MainCtrl", function($scope, $timeout, $filter) {
 			}, 0);
 			$scope.sort = "common.title";
 		}
+
+		$scope.musics = $filter("orderBy")($scope.musics, $scope.sort);
 	}
 
 	function bufferToBase64(buf) {

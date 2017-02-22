@@ -26,62 +26,52 @@ body {
 	overflow: hidden;
 }
 
-// .container {
-// 	padding: 0px;
-// 	width: 100%;
 
-// 	.header {
-// 		height: 50px;
-// 		background-color: $header-color;
-// 		padding-top: 4px;
 
-// 		.controls {
-// 			display: flex;
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    position: absolute;
+    z-index: 99;
+}
 
-// 			i {
-// 				margin-right: 8px;
-// 				cursor: pointer;
-// 			}
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s
+}
 
-// 			audio {
-// 				margin-left: 150px;
-// 			}
+.sidenav a:hover, .offcanvas a:focus{
+    color: #f1f1f1;
+}
 
-// 			#volume {
-// 				position: absolute;
-// 				left: 120px;
-// 				top: 22px;
-// 				margin: 0 auto;
-// 				height: 5px;
-// 				width: 100px;
-// 				background: #888;
-// 				border-radius: 15px;
-				
-// 				.ui-slider-range-min {
-// 					height: 5px;
-// 					width: 300px;
-// 					position: absolute;
-// 					background: $primary-color;
-// 					border: none;
-// 					border-radius: 10px;
-// 			  		outline: none;
-// 				}
-				
-// 				.ui-slider-handle {
-// 					width: 15px;
-// 				  	height: 15px;
-// 					border-radius: 50%;
-// 				  	background: #FFF;
-// 				  	position: absolute;
-// 				  	margin-left: -5px;
-// 				  	margin-top: -5px;
-// 				  	cursor: pointer;
-// 				  	outline: none;
-// 				}
-// 			}
-// 		}
-// 	}
-// }
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+
+
+
+
 
 .selected {
 	background-color: $selected;
@@ -187,10 +177,11 @@ body {
 			padding: 0px 15%;
 
 			.sort-buttons {
-				border: 1px solid $white;
+				border: 1px solid $selected;
 				display: flex;
 				margin-top: 13px;
 				color: $white;
+				border-radius: 15px;
 
 				.sort-button {
 					width: 25%;
@@ -199,7 +190,7 @@ body {
 					overflow: hidden;
 					text-overflow: ellipsis;
 					white-space: nowrap;
-					border-right: 1px solid $white;
+					border-right: 1px solid $selected;
 					cursor: pointer;
 				}
 			}
@@ -226,7 +217,7 @@ body {
 	.info {
 		width: 30%;
 		max-width: 400px;
-		height: calc(100% - 95px);
+		height: calc(100% - 90px);
 		background-color: $pear;
 		position: absolute;
 		right: 0px;
@@ -384,16 +375,18 @@ body {
 			text-align: center;
 			color: $white;
 			position: absolute;
+			bottom: 0px;
+			height: 30px;
 
 			p {
 				margin: 0px;
-				margin-top: 6px;
+				margin-top: 4px;
 			}
 		}
 
 		.tracks-list-body {
 		    height: calc(100% - 30px);
-		    max-height: calc(100% - 95px);
+		    max-height: calc(100% - 90px);
 		    margin-top: 60px;
 		    overflow: auto;
 

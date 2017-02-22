@@ -18,6 +18,24 @@
 	<script>if (window.module) module = window.module;</script>
 </head>
 <body ng-app="myApp" ng-controller="MainCtrl">
+
+	<div id="mySidenav" class="sidenav">
+	  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+	  <a href="#">About</a>
+	  <a href="#">Services</a>
+	  <a href="#">Clients</a>
+	  <a href="#">Contact</a>
+	</div>
+
+	<script>
+	function openNav() {
+	    document.getElementById("mySidenav").style.width = "250px";
+	}
+
+	function closeNav() {
+	    document.getElementById("mySidenav").style.width = "0";
+	}
+	</script>
 	<!-- <div class="container theme-dark">
 		<div class="header">
 			<div class="controls" id="player">
@@ -44,19 +62,19 @@
 				<!-- <h2 style="margin-top: 5px; font-size: 35px;">S.A.P</h2>
 				<p style="margin-top: -15px; font-size: 10px;">Simple Audio Player</p> -->
 
-				<i class="icon ion-navicon"></i>
+				<!-- <i class="icon ion-navicon" onclick="openNav()"></i> -->
 			</div>
 			<div class="header-center">
 
 				<div class="sort-buttons">
-					<div class="sort-button selected" ng-click="changeSort('song')">Song</div>
+					<div class="sort-button selected" ng-click="changeSort('song')" style=" border-top-left-radius: 15px; border-bottom-left-radius: 15px;">Song</div>
 					<div class="sort-button" ng-click="changeSort('time')">Time</div>
 					<div class="sort-button" ng-click="changeSort('artist')">Artist</div>
-					<div class="sort-button" ng-click="changeSort('album')" style="border-right: none;">Album</div>
+					<div class="sort-button" ng-click="changeSort('album')" style="border-right: none; border-top-right-radius: 15px; border-bottom-right-radius: 15px;">Album</div>
 				</div>
 			</div>
 			<div class="header-right">
-				<input type="text" placeholder="Search">
+				<!-- <input type="text" placeholder="Search"> -->
 			</div>
 		</div>
 
@@ -84,7 +102,7 @@
 			</div>
 
 			<div class="footer-bar">
-				<p>{{total_songs}} {{total_songs > 1 ?  'songs' : 'song'}}, {{total_time}} {{minutes ? 'minutes' : 'minute'}}</p>
+				<p>{{total_songs}} {{total_songs > 1 ?  'tracks' : 'track'}}, {{total_time}} {{minutes ? 'minutes' : 'minute'}}</p>
 			</div>
 		</div>
 

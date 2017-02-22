@@ -12,6 +12,44 @@
 body {
   overflow: hidden; }
 
+.sidenav {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+  position: absolute;
+  z-index: 99; }
+
+.sidenav a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+  transition: 0.3s; }
+
+.sidenav a:hover, .offcanvas a:focus {
+  color: #f1f1f1; }
+
+.sidenav .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px; }
+
+@media screen and (max-height: 450px) {
+  .sidenav {
+    padding-top: 15px; }
+
+  .sidenav a {
+    font-size: 18px; } }
 .selected {
   background-color: #459ce7; }
 
@@ -90,10 +128,11 @@ body {
       text-align: center;
       padding: 0px 15%; }
       .main-content .header-bar .header-center .sort-buttons {
-        border: 1px solid #FFF;
+        border: 1px solid #459ce7;
         display: flex;
         margin-top: 13px;
-        color: #FFF; }
+        color: #FFF;
+        border-radius: 15px; }
         .main-content .header-bar .header-center .sort-buttons .sort-button {
           width: 25%;
           height: 30px;
@@ -101,7 +140,7 @@ body {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
-          border-right: 1px solid #FFF;
+          border-right: 1px solid #459ce7;
           cursor: pointer; }
     .main-content .header-bar .header-right {
       width: 15%;
@@ -119,7 +158,7 @@ body {
   .main-content .info {
     width: 30%;
     max-width: 400px;
-    height: calc(100% - 95px);
+    height: calc(100% - 90px);
     background-color: #4d4d4d;
     position: absolute;
     right: 0px;
@@ -230,13 +269,15 @@ body {
       border-top: 1px solid #000;
       text-align: center;
       color: #FFF;
-      position: absolute; }
+      position: absolute;
+      bottom: 0px;
+      height: 30px; }
       .main-content .list .footer-bar p {
         margin: 0px;
-        margin-top: 6px; }
+        margin-top: 4px; }
     .main-content .list .tracks-list-body {
       height: calc(100% - 30px);
-      max-height: calc(100% - 95px);
+      max-height: calc(100% - 90px);
       margin-top: 60px;
       overflow: auto; }
       .main-content .list .tracks-list-body .tracks-list-tiles {
