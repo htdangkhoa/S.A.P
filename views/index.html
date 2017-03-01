@@ -18,64 +18,55 @@
 	<script>if (window.module) module = window.module;</script>
 </head>
 <body ng-app="myApp" ng-controller="MainCtrl">
-
-	<div id="mySidenav" class="sidenav">
-	  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-	  <a href="#">About</a>
-	  <a href="#">Services</a>
-	  <a href="#">Clients</a>
-	  <a href="#">Contact</a>
-	</div>
-
-	<script>
-	function openNav() {
-	    document.getElementById("mySidenav").style.width = "250px";
-	}
-
-	function closeNav() {
-	    document.getElementById("mySidenav").style.width = "0";
-	}
-	</script>
-	<!-- <div class="container theme-dark">
-		<div class="header">
-			<div class="controls" id="player">
-				<i class="icon ion-ios-rewind" style="margin-left: 8px;"></i>
-				<i class="icon ion-ios-play"></i>
-				<i class="icon ion-ios-fastforward"></i>
-
-				<div id="volume"></div>
-			</div>
-		</div>
-	</div> -->
-
 	<div class="main-content">
-		<!-- <div class="table-header">
-			<div class="table-header-index"></div>
-			<div class="table-header-track">Track</div>
-			<div class="table-header-time">Time</div>
-			<div class="table-header-artist">Artist</div>
-			<div class="table-header-album">Album</div>
-		</div> -->
-
 		<div class="header-bar">
-			<div class="header-left">
-				<!-- <h2 style="margin-top: 5px; font-size: 35px;">S.A.P</h2>
-				<p style="margin-top: -15px; font-size: 10px;">Simple Audio Player</p> -->
+			<!-- <div class="header-left">
+				<h2 style="margin-top: 5px; font-size: 35px;">S.A.P</h2>
+				<p style="margin-top: -15px; font-size: 10px;">Simple Audio Player</p>
 
-				<!-- <i class="icon ion-navicon" onclick="openNav()"></i> -->
-			</div>
+				<i class="icon ion-ios-gear" onclick="openNav()"></i>
+			</div> -->
 			<div class="header-center">
-
-				<div class="sort-buttons">
-					<div class="sort-button selected" ng-click="changeSort('song')" style=" border-top-left-radius: 15px; border-bottom-left-radius: 15px;">Song</div>
-					<div class="sort-button" ng-click="changeSort('time')">Time</div>
-					<div class="sort-button" ng-click="changeSort('artist')">Artist</div>
-					<div class="sort-button" ng-click="changeSort('album')" style="border-right: none; border-top-right-radius: 15px; border-bottom-right-radius: 15px;">Album</div>
+				<!-- Modal -->
+				<div class="modal fade bd-example-modal-sm" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+				  <div class="modal-dialog modal-sm">
+				    <div class="modal-content">
+				    	<h2>{{ 'PREFERENCES' | translate}}</h2>
+				    	<div class="item-setting">
+							<div>
+								<p>Theme:</p>
+								<select class="form-control" ng-model="themes" ng-init="" ng-change="">
+									<option value="dark">Dark</option>
+									<option value="white">White</option>
+								</select>
+							</div>
+							<div>
+								<p>Language:</p>
+								<select class="form-control" ng-model="locales" ng-init="initLocale()" ng-change="changeLang(locales)">
+									<option value="en">English</option>
+									<option value="vi">Vietnamese</option>
+								</select>
+							</div>
+				    	</div>
+				    </div>
+				  </div>
 				</div>
+
+				<center>
+					<div class="sort-buttons">
+						<div id="btn-sort-title" class="sort-button sorted" ng-click="changeSort('title')" title="{{ 'SORT BY TITLE' | translate}}">{{ 'TITLE' | translate }}</div>
+						<div id="btn-sort-time" class="sort-button" ng-click="changeSort('time')" title="{{ 'SORT BY TIME' | translate}}">{{ 'TIME' | translate }}</div>
+						<div id="btn-sort-artist" class="sort-button" ng-click="changeSort('artist')" title="{{ 'SORT BY ARTIST' | translate}}">{{ 'ARTIST' | translate }}</div>
+						<div id="btn-sort-album" class="sort-button" ng-click="changeSort('album')" title="{{ 'SORT BY ALBUM' | translate}}">{{ 'ALBUM' | translate }}</div>
+					</div>
+				</center>
 			</div>
-			<div class="header-right">
-				<!-- <input type="text" placeholder="Search"> -->
-			</div>
+			<!-- <div class="header-right">
+				<input type="text" placeholder="Search" ng-model="searchContent" ng-keyup="search()">
+				<center>
+					<div style="width: 0; height: 0; border-style: solid; border-width: 0 13.5px 15px 13.5px; border-color: transparent transparent #fff transparent;"></div>
+				</center>
+			</div> -->
 		</div>
 
 		<div class="list">
@@ -87,34 +78,36 @@
 				<div class="track-cell-header cell-album">Album</div>
 			</div> -->
 
-			<div class="tracks-list-body">
+			<div class="tracks-list-body done" style="display: none;">
 				<div class="tracks-list-tiles">
 					<div class="tracks-list-tile">
-						<div class="track" ng-class="$index % 2 === 0 ? 'track-pear' : 'track-foot' " ng-repeat="music in musics | orderBy: sort" ng-click="playSong( $index, music.common.path, music.common.title, music.common.artists[0], music['id3v2.3'], music.format.duration )">
+						<div id="{{music.id}}" class="track" ng-class="$index % 2 === 0 ? 'track-pear' : 'track-foot' " ng-repeat="music in musics | orderBy: sort" ng-click="playSong( $index, music.path, music.title, music.artist, music['id3v2.3'], music.duration )">
 							<div class="cell cell-track-playing text-center">{{ $index + 1 }}</div>
-							<div class="cell cell-track">{{ music.common.title }}</div>
-							<div class="cell cell-duration">{{ music.format.duration || '00:00' }}</div>
-							<div class="cell cell-artist">{{ music.common.artists[0] }}</div>
-							<div class="cell cell-album">{{ music.common.album }}</div>
+							<div class="cell cell-track">{{ music.title }}</div>
+							<div class="cell cell-duration">{{ music.duration || '00:00' }}</div>
+							<div class="cell cell-artist">{{ music.artist }}</div>
+							<div class="cell cell-album">{{ music.album }}</div>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<div class="footer-bar">
-				<p>{{total_songs}} {{total_songs > 1 ?  'tracks' : 'track'}}, {{total_time}} {{minutes ? 'minutes' : 'minute'}}</p>
+				<p class="loading" ="loading">{{ 'LOADING' | translate }}...</p>
+				<p class="done" style="display: none;">{{ total_songs }} {{ total_songs > 1 ?  ('TRACKS' | translate) : ('TRACK' | translate) }}, {{total_time}}</p>
 			</div>
 		</div>
 
 		<div class="info">
 			<center>
 				<div class="cover" ng-class="current !== undefined ? 'spinning' : ''" ng-show="showCover" style="padding: 0px; animation-play-state: paused;">
-					<img width="250" height="250" src="{{ cover }}">
-					<!-- <div></div> -->
+					<img width="250" height="250" src="{{cover}}">
 				</div>
-				<div ng-click="yt()" class="cover" ng-class="current !== undefined ? 'spinning' : ''" ng-hide="showCover" style="animation-play-state: paused;">
+
+				<div data-toggle="modal" data-target="#exampleModal" class="cover" ng-class="current !== undefined ? 'spinning' : ''" ng-hide="showCover" style="animation-play-state: paused;">
 					<i class="icon ion-ios-musical-notes"></i>
 				</div>
+
 				<div class="track-info">
 					<h3>{{track_title}}</h2>
 					<p>{{track_artist}}</p>
@@ -130,41 +123,56 @@
 
 					<div class="control control1">
 						<div>
-							<i class="icon ion-ios-rewind" title="Previous" ng-click="previousSong(loop, shuffle)"></i>
+							<i id="btn-back" class="icon ion-ios-rewind" title="{{ 'PREVIOUS' | translate }}" ng-click="previousSong(loop, shuffle)"></i>
 						</div>
 						<div ng-hide="isPlay">
-							<i class="icon ion-ios-play" title="Play" ng-click="play()"></i>
+							<i class="icon ion-ios-play" title="{{ 'PLAY' | translate }}" ng-click="play()"></i>
 						</div>
 						<div ng-hide="isPause">
-							<i class="icon ion-ios-pause" title="Pause" ng-click="pause()"></i>
+							<i class="icon ion-ios-pause" title="{{ 'PAUSE' | translate }}" ng-click="pause()"></i>
 						</div>
 						<div>
-							<i class="icon ion-ios-fastforward" title="Next" ng-click="nextSong(loop, shuffle)"></i>
+							<i id="btn-next" class="icon ion-ios-fastforward" title="{{ 'NEXT' | translate }}" ng-click="nextSong(loop, shuffle)"></i>
 						</div>
 					</div>
 
 					<div class="control control2">
 						<div style="left: 10px;">
-							<i class="icon ion-ios-shuffle-strong" ng-class="shuffle === 'true' ? 'loop-or-shuffle' : ''" ng-click="shuffleFunction()" title="Shuffle"></i>
+							<i class="icon ion-ios-shuffle-strong" ng-class="shuffle === 'true' ? 'loop-or-shuffle' : ''" ng-click="shuffleFunction()" title="{{ 'SHUFFLE' | translate }}: {{ shuffle === 'true' ? ('ON' | translate) : ('OFF' | translate) }}"></i>
 						</div>
 						<div class="slider-bar" id="volume-duration"></div>
 						<div style="right: 10px;">
-							<i class="icon ion-ios-loop-strong" ng-class="loop !== 'none' ? 'loop-or-shuffle' : ''" ng-click="loopFunction()" title="Repeat"></i>
-							<span class="loop-or-shuffle" id="repeat-one" ng-show="loop === 'one'" ng-click="loopFunction()" title="Repeat">1</span>
+							<i class="icon ion-ios-loop-strong" ng-class="loop !== 'none' ? 'loop-or-shuffle' : ''" ng-click="loopFunction()" title="{{ 'REPEAT' | translate }}: {{ loop === 'none' ? ('NONE' | translate) : (loop === 'all' ? ('ALL' | translate) : ('ONE' | translate) ) }}"></i>
+
+							<span class="loop-or-shuffle" id="repeat-one" ng-show="loop === 'one'" ng-click="loopFunction()" title="{{ 'REPEAT' | translate }}: {{ 'ONE' | translate }}">1</span>
 						</div>
 					</div>
-					<!-- <i class="icon ion-ios-rewind" style="margin-left: 8px;"></i>
-					<i class="icon ion-ios-play"></i>
-					<i class="icon ion-ios-fastforward"></i> -->
-
-					<!-- <div id="volume"></div> -->
 				</div>
 			</center>
 		</div>
+
+		<!-- <div class="list-search">
+			<div class="border-result-box">
+				<div class="search-options">
+					<div class="search-option">
+						<input type="checkbox" name="vehicle" value="Bike">Artist
+					</div>
+					<div class="search-option">
+						<input type="checkbox" name="vehicle" value="Bike">Album
+					</div>
+				</div>
+				<div class="result-box">
+					<div class="result-item" ng-repeat="item in listSearch" id="{{item.id}}">{{ item.title }}</div>
+				</div>
+			</div>
+		</div> -->
 	</div>
 </body>
 
 <script type="text/javascript" src="../libs/angular.min.js"></script>
+<script src="../libs/angular-translate/dist/angular-translate.js"></script>
+<script src="../libs/angular-translate-loader-static-files/angular-translate-loader-static-files.min.js"></script>
+
 <script type="text/javascript" src="../js/app.js"></script>
 <script type="text/javascript" src="../js/audio.js"></script>
 <script type="text/javascript" src="../js/MainCtrl.js"></script>

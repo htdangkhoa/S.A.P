@@ -1,0 +1,4 @@
+node_modules/
+test/*.flac
+test/*.mp3
+npm-debug.log

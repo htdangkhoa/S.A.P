@@ -9,8 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "flac-to-mp3": "^1.0.4",
+    "moment": "^2.17.1",
+    "moment-duration-format": "^1.3.0",
     "music-metadata": "^0.6.1",
-    "sec-to-min": "^1.0.1"
+    "node-uuid": "^1.4.7"
   },
   "devDependencies": {
     "electron-packager": "^8.5.2",

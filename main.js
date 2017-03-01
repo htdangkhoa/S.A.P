@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require("electron");
+const {app, BrowserWindow, Menu} = require("electron");
 const path = require("path");
 const url = require("url");
 
@@ -18,7 +18,7 @@ app.on("ready", function() {
 		slashes: true
 	}));
 
-	// win.webContents.openDevTools();
+	win.webContents.openDevTools();
 
 	win.on("closed", function() {
 		win = null

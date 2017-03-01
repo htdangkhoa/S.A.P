@@ -1,10 +1,16 @@
-app.controller("MainCtrl", function($scope, $timeout, $filter) {
+app.controller("MainCtrl", function($scope, $timeout, $filter, $translate) {
+	const {remote} = require('electron');
+	const {BrowserWindow, globalShortcut} = remote;
+	const win = BrowserWindow.getFocusedWindow();
+	const {Menu, MenuItem} = remote;
+	let menu;
+
 	var fs = require("fs");
 	var _path = require("path");
+	var uuid = require("node-uuid");
 	var mm = require("music-metadata");
-	var secToMin = require("sec-to-min");
-	var ytdl = require("youtube-dl");
-	var downloader = require('../node_modules/youtube-dl/lib/downloader');
+	var moment = require("moment");
+	require("moment-duration-format");
 
 	var home_path = process.env.HOME;
 	process.env.MUSIC = JSON.stringify([]);
@@ -22,7 +28,8 @@ app.controller("MainCtrl", function($scope, $timeout, $filter) {
 	$scope.total_songs = 0;
 	$scope.total_time = "00:00";
 	var totalTime = 0;
-	$scope.sort = "common.title";
+	$scope.sort = "title";
+	$scope.notMusicFile = 0;
 
 
 	if (!localStorage.getItem("loop") || $scope.loops.indexOf(localStorage.getItem("loop")) === -1){
@@ -40,7 +47,212 @@ app.controller("MainCtrl", function($scope, $timeout, $filter) {
 
 	initMusicPath();
 
+	function readDir(path_of_dir) {
+		fs.readdir(path_of_dir, function(err, files) {
+		    if (err) return;
+
+		    files.forEach(function(f) {
+		    	var filePath = path_of_dir + "/" + f;
+		    	var extension = _path.extname(filePath);
+
+		    	if (!fs.statSync(filePath).isDirectory()){
+	    			var audioStream = fs.createReadStream(filePath);
+
+					mm.parseStream(audioStream, {native: true}, function (err, metadata) {
+						// console.log(metadata)
+						var file_type = metadata.format.dataformat;
+
+						if (file_type === "mp3" || file_type === "ogg" || file_type === "wav") {
+							audioStream.close();
+							if (err) console.log(err)
+
+							var object = {};
+							object.id = uuid.v4();
+
+							if (!metadata.common.title) {
+								metadata.common.title = f.replace(extension, "");
+							}
+							object.title = metadata.common.title;
+
+							if (!metadata.common.artists[0]) {
+								metadata.common.artists[0] = "Unknown";
+							}
+							object.artist = metadata.common.artists[0];
+
+							if (!metadata.common.album) {
+								metadata.common.album = "Unknown";
+							}
+							object.album = metadata.common.album;
+
+							object["id3v2.3"] = metadata["id3v2.3"];
+
+							metadata.common.path = path_of_dir + "/" + encodeURIComponent(f);
+							object.path = metadata.common.path;
+
+							totalTime = parseFloat(totalTime) + parseFloat(metadata.format.duration);
+							$scope.total_time = moment.duration(totalTime, "seconds").format("hh:mm:ss");
+
+							object.second = metadata.format.duration;
+
+							metadata.format.duration = moment.duration(metadata.format.duration, "seconds").format("mm:ss");
+
+							// console.log(moment.duration(metadata.format.duration, "minutes").format())
+							object.duration = metadata.format.duration;
+
+							$timeout(function() {
+								$scope.musics.push(object);
+								$scope.$apply();
+
+								$scope.musics = $filter("orderBy")($scope.musics, $scope.sort);
+								$scope.total_songs = $scope.musics.length;
+							}, 0);
+
+							$timeout(function() {
+								// $(".done").css("display", "block");
+								if ($scope.musics.length === $scope.total_songs) {
+									$(".loading").css("display", "none");
+									$(".done").css("display", "block");
+
+									$scope.listSearch = $scope.musics;
+
+									// $scope.listSearch.forEach(function(item){
+									// 	item.search_by_title = item.title.toLowerCase()
+									// })
+								}
+							}, 0);
+						}else {
+							$scope.notMusicFile += 1;
+						}
+					});
+		    	}else{
+		    		readDir(path_of_dir + "/" + f)
+		    	}
+		    });
+
+		    // fs.closeSync(2);
+		});
+	}
+
+	function init_menu_bar() {
+		
+
+		Menu.setApplicationMenu(null);
+
+		$timeout(function() {
+			$translate(["CHECK FOR UPDATES", "QUIT", "SORT", "BY TITLE", "BY TIME", "BY ARTIST", "BY ALBUM", "PREFERENCES", "PLAY/PAUSE", "NEXT", "PREVIOUS", "FILE", "EDIT", "CONTROL"]).then(function(data){
+				var template_menu = [{
+					label: data["FILE"],
+					submenu: [{
+						label: data["CHECK FOR UPDATES"],
+						click: function(){
+
+						}
+					}, {
+						type: "separator"
+					}, {
+						label: data["QUIT"],
+						accelerator: "CmdOrCtrl+Q",
+						click: function(){
+							win.close();
+						}
+					}]
+				}, {
+					label: data["EDIT"],
+					submenu: [{
+						label: data["SORT"],
+						submenu: [{
+							label: data["BY TITLE"],
+							click: function(){
+								$timeout(function() {
+									$("#btn-sort-title").trigger("click");
+								}, 0);
+							}
+						}, {
+							label: data["BY TIME"],
+							click: function(){
+								$timeout(function() {
+									$("#btn-sort-time").trigger("click");
+								}, 0);
+							}
+						}, {
+							label: data["BY ARTIST"],
+							click: function(){
+								$timeout(function() {
+									$("#btn-sort-artist").trigger("click");
+								}, 0);
+							}
+						}, {
+							label: data["BY ALBUM"],
+							click: function(){
+								$timeout(function() {
+									$("#btn-sort-album").trigger("click");
+								}, 0);
+							}
+						}]
+					}, {
+						label: data["PREFERENCES"],
+						accelerator: "CmdOrCtrl+,",
+						click: function(){
+							$timeout(function() {
+								$('#settingsModal').modal("show");
+							}, 0);
+						}
+					}]
+				}, {
+					label: data["CONTROL"],
+					submenu: [{
+						label: data["PLAY/PAUSE"],
+						accelerator: "CmdOrCtrl+P",
+						click: function(){
+							if (myMedia.paused) {
+								$scope.play();
+							}else {
+								$scope.pause();
+							}
+						}
+					}, {
+						label: data["NEXT"],
+						accelerator: "CmdOrCtrl+Right",
+						click: function(){
+							$timeout(function() {
+								$("#btn-next").trigger("click");
+							}, 0);
+						}
+					}, {
+						label: data["PREVIOUS"],
+						accelerator: "CmdOrCtrl+Left",
+						click: function(){
+							$timeout(function() {
+								$("#btn-back").trigger("click");
+							}, 0);
+						}
+					}]
+				}, {
+					label: "Develop",
+					submenu: [{
+						label: "Open devtools",
+						accelerator: "CmdOrCtrl+Shift+I",
+						click: function(){
+							win.webContents.toggleDevTools();
+						}
+					}, {
+						label: "Reload",
+						accelerator: "CmdOrCtrl+R",
+						click: function(){
+							win.webContents.reload();
+						}
+					}]
+				}];
+
+				menu = Menu.buildFromTemplate(template_menu);
+				Menu.setApplicationMenu(menu)
+			})
+		}, 0);
+	}
+
 	function initMusicPath() {
+		init_menu_bar();
+
 		$scope.platform = navigator.platform;
 		if ($scope.platform.indexOf("Win") !== -1){
 
@@ -50,80 +262,16 @@ app.controller("MainCtrl", function($scope, $timeout, $filter) {
 			// console.log(music_path[0]);
 			 music_path.push(home_path + "/Music");
 		}
+
+		$timeout(function() {
+			readDir(music_path[0]);
+		}, 500);
 	}
 
-	// fs.realpath(music_path[0], function(err, path) {
-	//     if (err) {
-	//         console.log(err);
-	//      return;
-	//     }
-	//     console.log('Path is : ' + path);
-	// });
-
-	// var files = fs.readdirSync(music_path[0]);
-
-	fs.readdir(music_path[0], function(err, files) {
-	    if (err) return;
-
-	    files.forEach(function(f) {
-	    	var filePath = music_path[0] + "/" + f;
-	    	var extension = _path.extname(filePath);
-
-	    	if (extension === ".mp3" || extension === ".ogg" || extension === ".wav") {
-	    		var audioStream = fs.createReadStream(filePath)
-
-				mm.parseStream(audioStream, {native: true}, function (err, metadata) {
-					audioStream.close();
-					if (err) throw err;
-
-					if (!metadata.common.title) {
-						metadata.common.title = f.replace(extension, "");
-					}
-
-					if (!metadata.common.artists[0]) {
-						metadata.common.artists[0] = "Unknown";
-					}
-
-					if (!metadata.common.album) {
-						metadata.common.album = "Unknown";
-					}
-
-					metadata.common.path = music_path[0] + "/" + encodeURIComponent(f);
-
-					totalTime += parseFloat(metadata.format.duration);
-
-					if (secToMin(totalTime).indexOf(":") === 1){
-						$scope.total_time = "0" + secToMin(totalTime);
-					}else {
-						$scope.total_time = secToMin(totalTime);
-					}
-
-					if (parseInt($scope.total_time.substring(0, $scope.total_time.indexOf(":"))) <= 1){
-						$scope.minutes = false;
-					}else {
-						$scope.minutes = true;
-					}
-					
-					metadata.format.duration = secToMin(metadata.format.duration);
-
-					if (metadata.format.duration.indexOf(":") === 1){
-						metadata.format.duration = "0" + metadata.format.duration;
-					}
-
-					$timeout(function() {
-						$scope.musics.push(metadata);
-						$scope.$apply();
-						$scope.musics = $filter("orderBy")($scope.musics, $scope.sort);
-						$scope.total_songs = $scope.musics.length;
-					}, 0);
-				});
-	    	}
-	    });
-
-	    fs.closeSync(2);
-	});
-
 	$scope.playSong = function(index, path, title, artist, img, time){
+		console.log(index, path, title, artist, img, time)
+
+
 		$(".track").removeClass("selected");
 
 		$(".cover").each(function(){
@@ -141,7 +289,7 @@ app.controller("MainCtrl", function($scope, $timeout, $filter) {
 			}
 		})
 
-		if (checkFile) {
+		// if (checkFile) {
 			if ($scope.shuffle === "true" && list_random.length === 0) {
 				list_random.push(index);
 			}
@@ -172,75 +320,81 @@ app.controller("MainCtrl", function($scope, $timeout, $filter) {
 			if ($scope.durationTo.indexOf(":") === 1){
 				$scope.durationTo = "0" + $scope.durationTo;
 			}
-		}else {
-			$scope.pause();
-			$(".cover").removeClass("spinning");
-			$("#audio-player")[0].currentTime = 0;
-			$scope.count = 1;
-		}
+		// }else {
+		// 	$scope.pause();
+		// 	$(".cover").removeClass("spinning");
+		// 	$("#audio-player")[0].currentTime = 0;
+		// 	$scope.count = 1;
+		// }
 	}
 
 	$scope.nextSong =function(isLoop, isShuffle) {
 		var index;
 
-		if (isShuffle === "true") {
-			index = $scope.random();
-		}else {
-			if ($scope.current >= $scope.musics.length - 1) {
-				index = 0;
+		console.log($scope.current)
+
+		if ($scope.current !== undefined){
+			if (isShuffle === "true") {
+				index = $scope.random();
 			}else {
-				index = $scope.current + 1;
+				if ($scope.current >= $scope.musics.length - 1) {
+					index = 0;
+				}else {
+					index = $scope.current + 1;
+				}
 			}
-		}
 
-		var path = $scope.musics[index].common.path;
-		var title = $scope.musics[index].common.title;
-		var artist = $scope.musics[index].common.artist;
-		var img = $scope.musics[index]['id3v2.3'];
-		var time = $scope.musics[index].format.duration;
+			var path = $scope.musics[index].path;
+			var title = $scope.musics[index].title;
+			var artist = $scope.musics[index].artist;
+			var img = $scope.musics[index]['id3v2.3'];
+			var time = $scope.musics[index].duration;
 
-		$scope.playSong(index, path, title, artist, img, time);
+			$scope.playSong(index, path, title, artist, img, time);
 
-		if (isLoop === "none" && $scope.count > $scope.musics.length) {
-			$timeout(function() {
-				$scope.pause();
-				$(".cover").removeClass("spinning");
-				$("#audio-player")[0].currentTime = 0;
-				$scope.count = 1;
-			}, 10);
+			if (isLoop === "none" && $scope.count > $scope.musics.length) {
+				$timeout(function() {
+					$scope.pause();
+					$(".cover").removeClass("spinning");
+					$("#audio-player")[0].currentTime = 0;
+					$scope.count = 1;
+				}, 10);
+			}
 		}
 	}
 
 	$scope.previousSong =function(isLoop, isShuffle) {
 		var index;
 
-		if (isShuffle === "true") {
-			index = $scope.random();
-		}else {
-			if ($scope.current <= 0) {
-				index = $scope.musics.length - 1;
+		if ($scope.current !== undefined){
+			if (isShuffle === "true") {
+				index = $scope.random();
 			}else {
-				index = $scope.current - 1;
+				if ($scope.current <= 0) {
+					index = $scope.musics.length - 1;
+				}else {
+					index = $scope.current - 1;
+				}
 			}
-		}
 
-		var path = $scope.musics[index].common.path;
-		var title = $scope.musics[index].common.title;
-		var artist = $scope.musics[index].common.artist;
-		var img = $scope.musics[index]['id3v2.3'];
-		var time = $scope.musics[index].format.duration;
+			var path = $scope.musics[index].path;
+			var title = $scope.musics[index].title;
+			var artist = $scope.musics[index].artist;
+			var img = $scope.musics[index]['id3v2.3'];
+			var time = $scope.musics[index].duration;
 
-		$scope.playSong(index, path, title, artist, img, time);
+			$scope.playSong(index, path, title, artist, img, time);
 
-		console.log($scope.count)
+			console.log($scope.count)
 
-		if (isLoop === "none" &&  $scope.count > $scope.musics.length) {
-			$timeout(function() {
-				$scope.pause();
-				$(".cover").removeClass("spinning");
-				$scope.count = 1;
-				$("#audio-player")[0].currentTime = 0;
-			}, 10);
+			if (isLoop === "none" &&  $scope.count > $scope.musics.length) {
+				$timeout(function() {
+					$scope.pause();
+					$(".cover").removeClass("spinning");
+					$scope.count = 1;
+					$("#audio-player")[0].currentTime = 0;
+				}, 10);
+			}
 		}
 	}
 
@@ -314,7 +468,7 @@ app.controller("MainCtrl", function($scope, $timeout, $filter) {
 		})
 
 		$timeout(function() {
-			$scope.durationFrom = secToMin($("#audio-player")[0].currentTime);
+			$scope.durationFrom = moment.duration($("#audio-player")[0].currentTime, "seconds").format("mm:ss", { trim: "right" });
 			if ($scope.durationFrom.indexOf(":") === 1){
 				$scope.durationFrom = "0" + $scope.durationFrom;
 			}
@@ -340,50 +494,73 @@ app.controller("MainCtrl", function($scope, $timeout, $filter) {
 	}
 
 	$scope.changeSort = function(mode) {
-		$(".sort-button").removeClass("selected");
+		$(".sort-button").removeClass("sorted");
+
 		if (mode === "time"){
 			$timeout(function() {
-				$($(".sort-button")[1]).addClass("selected");
+				$($(".sort-button")[1]).addClass("sorted");
 			}, 0);
-			$scope.sort = "format.duration";
+
+			$timeout(function() {
+				$scope.sort = "duration";
+			}, 100);
 		}else if (mode === "artist") {
 			$timeout(function() {
-				$($(".sort-button")[2]).addClass("selected");
+				$($(".sort-button")[2]).addClass("sorted");
 			}, 0);
-			$scope.sort = "common.artists[0]";
+
+			$timeout(function() {
+				$scope.sort = "artist";
+			}, 100);
 		}else if (mode === "album") {
 			$timeout(function() {
-				$($(".sort-button")[3]).addClass("selected");
+				$($(".sort-button")[3]).addClass("sorted");
 			}, 0);
-			$scope.sort = "common.album";
+
+			$timeout(function() {
+				$scope.sort = "album";
+			}, 100);
 		}else {
 			$timeout(function() {
-				$($(".sort-button")[0]).addClass("selected");
+				$($(".sort-button")[0]).addClass("sorted");
 			}, 0);
-			$scope.sort = "common.title";
+
+			$timeout(function() {
+				$scope.sort = "title";
+			}, 100);
 		}
 
 		$scope.musics = $filter("orderBy")($scope.musics, $scope.sort);
 	}
+
+	$scope.search = function(){
+		$scope.listSearch = $scope.musics;
+		$scope.listSearch.forEach(function(item){
+			item.search_by_title = item.title.toLowerCase()
+		})
+
+		if ($scope.searchContent !== undefined){
+			$scope.listSearch = $filter("filter")($scope.listSearch, {search_by_title: $scope.searchContent.toLowerCase()});
+		}
+	}
+
+	$scope.initLocale= function(){
+		$scope.locales = localStorage.getItem("lang");
+	}
+
+	$scope.changeLang = function(key){
+		localStorage.setItem("lang", key);
+		$translate.use(key);
+
+		init_menu_bar();
+	}
+
+
 
 	function bufferToBase64(buf) {
 	    var binstr = Array.prototype.map.call(buf, function (ch) {
 	        return String.fromCharCode(ch);
 	    }).join('');
 	    return "data:image/png;base64," + btoa(binstr);
-	}
-
-	$scope.yt = function(){
-		var url = 'https://www.youtube.com/watch?v=H7HmzwI67ec';
-		ytdl.exec(url, ['-x', '--audio-format', 'mp3'], {}, function(err, output) {
-		  if (err) throw err;
-		  console.log(output.join('\n'));
-		});
-
-		downloader(__dirname + '/Owl City & Carly Rae Jepsen - Good Time-H7HmzwI67ec.mp3', function error(err, done) {
-		  'use strict';
-		  if (err) { return console.log(err.stack); }
-		  console.log(done);
-		});
 	}
 });
