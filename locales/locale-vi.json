@@ -32,5 +32,11 @@
 	"LOADING": "Đang tải",
 	"FILE": "Tệp",
 	"EDIT": "Chỉnh sửa",
-	"CONTROL": "Điều khiển"
+	"CONTROL": "Điều khiển",
+	"LANGUAGE": "Ngôn ngữ",
+	"FOLDER (S)": "Thư mục",
+	"ADD FOLDER (S)": "Thêm thư mục",
+	"THEME": "Chủ đề",
+	"DARK": "Tối",
+	"LIGHT": "Sáng"
 }

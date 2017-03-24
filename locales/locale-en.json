@@ -32,5 +32,11 @@
 	"LOADING": "Loading",
 	"FILE": "File",
 	"EDIT": "Edit",
-	"CONTROL": "Control"
+	"CONTROL": "Control",
+	"LANGUAGE": "Language",
+	"FOLDER (S)": "Folder (s)",
+	"ADD FOLDER (S)": "Add folder (s)",
+	"THEME": "Theme",
+	"DARK": "Dark",
+	"LIGHT": "Light"
 }

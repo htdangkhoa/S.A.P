@@ -1,3 +1,7 @@
+Array.prototype.diff = function(a) {
+    return this.filter(function(i) {return a.indexOf(i) < 0;});
+};
+
 var app = angular.module("myApp", ["pascalprecht.translate"]);
 app.config(function($translateProvider){
 	// $translateProvider.useSanitizeValueStrategy('sanitizeParameters');

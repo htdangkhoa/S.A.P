@@ -1,9 +1,10 @@
 app.controller("MainCtrl", function($scope, $timeout, $filter, $translate) {
 	const {remote} = require('electron');
-	const {BrowserWindow, globalShortcut} = remote;
-	const win = BrowserWindow.getFocusedWindow();
+	const {BrowserWindow, globalShortcut, dialog} = remote;
+	let win = BrowserWindow.getFocusedWindow();
 	const {Menu, MenuItem} = remote;
 	let menu;
+	let tray;
 
 	var fs = require("fs");
 	var _path = require("path");
@@ -12,12 +13,8 @@ app.controller("MainCtrl", function($scope, $timeout, $filter, $translate) {
 	var moment = require("moment");
 	require("moment-duration-format");
 
-	var home_path = process.env.HOME;
-	process.env.MUSIC = JSON.stringify([]);
-
-	var music_path = JSON.parse(process.env.MUSIC);
-
 	var list_random = [];
+	$scope.dirs = [];
 	$scope.musics = [];
 	$scope.showCover = false;
 	$scope.current;
@@ -30,6 +27,32 @@ app.controller("MainCtrl", function($scope, $timeout, $filter, $translate) {
 	var totalTime = 0;
 	$scope.sort = "title";
 	$scope.notMusicFile = 0;
+	$scope.locales = [{
+		name: "English",
+		value: "en"
+	}, {
+		name: "Tiếng Việt",
+		value: "vi"
+	}];
+
+	$scope.themes = [{
+		name: "DARK",
+		value: "dark"
+	}, {
+		name: "LIGHT",
+		value: "light"
+	}]
+
+	if (!localStorage.getItem("theme")){
+		localStorage.setItem("theme", "light");
+
+		// $scope.initTheme();
+	}
+
+	if (!localStorage.getItem("dirs")){
+		localStorage.setItem("dirs", JSON.stringify([]));
+	}
+	$scope.dirs = JSON.parse(localStorage.getItem("dirs"));
 
 
 	if (!localStorage.getItem("loop") || $scope.loops.indexOf(localStorage.getItem("loop")) === -1){
@@ -44,6 +67,39 @@ app.controller("MainCtrl", function($scope, $timeout, $filter, $translate) {
 		localStorage.setItem("shuffle", false);
 	}
 	$scope.shuffle = localStorage.getItem("shuffle");
+
+	angular.element(document).ready(function(){
+		$timeout(function() {
+			$($("#list-folder div")[0]).css("margin-top", "0px");
+		}, 0);
+
+		$('#settingsModal').on('hidden.bs.modal', function () {
+			$timeout(function() {
+				var checkDirs = JSON.parse(sessionStorage.getItem("backupDirs"));
+				var diffRootThanTemp = $scope.dirs.diff(checkDirs);
+				var diffTempThanRoot = checkDirs.diff($scope.dirs);
+
+				if (diffRootThanTemp.length !== 0 || diffTempThanRoot.length !== 0) {
+					$scope.musics = [];
+					totalTime = 0;
+
+					$scope.total_songs = 0;
+					$scope.total_time = "00:00";
+
+
+					$scope.dirs.forEach(function(item) {
+						$timeout(function() {
+							readDir(item);
+						}, 500);
+					})
+				}
+			}, 0);
+		});
+
+		$('#settingsModal').on('shown.bs.modal', function () {
+			sessionStorage.setItem("backupDirs", JSON.stringify($scope.dirs));
+		});
+	})
 
 	initMusicPath();
 
@@ -61,10 +117,16 @@ app.controller("MainCtrl", function($scope, $timeout, $filter, $translate) {
 					mm.parseStream(audioStream, {native: true}, function (err, metadata) {
 						// console.log(metadata)
 						var file_type = metadata.format.dataformat;
+						if (file_type === undefined) {
+							console.log(f)
+						}
 
-						if (file_type === "mp3" || file_type === "ogg" || file_type === "wav") {
+						if (file_type !== undefined && (file_type === "mp3" || file_type === "ogg" || file_type === "wav")) {
 							audioStream.close();
-							if (err) console.log(err)
+							if (err) {
+								console.log(err, f);
+								return;
+							}
 
 							var object = {};
 							object.id = uuid.v4();
@@ -96,7 +158,6 @@ app.controller("MainCtrl", function($scope, $timeout, $filter, $translate) {
 
 							metadata.format.duration = moment.duration(metadata.format.duration, "seconds").format("mm:ss");
 
-							// console.log(moment.duration(metadata.format.duration, "minutes").format())
 							object.duration = metadata.format.duration;
 
 							$timeout(function() {
@@ -125,7 +186,7 @@ app.controller("MainCtrl", function($scope, $timeout, $filter, $translate) {
 						}
 					});
 		    	}else{
-		    		readDir(path_of_dir + "/" + f)
+		    		$scope.notMusicFile += 1;
 		    	}
 		    });
 
@@ -134,8 +195,6 @@ app.controller("MainCtrl", function($scope, $timeout, $filter, $translate) {
 	}
 
 	function init_menu_bar() {
-		
-
 		Menu.setApplicationMenu(null);
 
 		$timeout(function() {
@@ -247,25 +306,50 @@ app.controller("MainCtrl", function($scope, $timeout, $filter, $translate) {
 				menu = Menu.buildFromTemplate(template_menu);
 				Menu.setApplicationMenu(menu)
 			})
-		}, 0);
+		}, 150);
 	}
 
 	function initMusicPath() {
 		init_menu_bar();
 
-		$scope.platform = navigator.platform;
-		if ($scope.platform.indexOf("Win") !== -1){
-
-		}else if ($scope.platform.indexOf("Mac") !== -1){
-
+		if ($scope.dirs.length === 0) {
+			$timeout(function() {
+				$(".loading").css("display", "none");
+				$(".done").css("display", "block");
+			}, 0);
 		}else {
-			// console.log(music_path[0]);
-			 music_path.push(home_path + "/Music");
+			$scope.dirs.forEach(function(item) {
+				$timeout(function() {
+					readDir(item);
+				}, 500);
+			})
 		}
+	}
 
-		$timeout(function() {
-			readDir(music_path[0]);
-		}, 500);
+	$scope.directoryPicker = function(){
+		var dirs = dialog.showOpenDialog({
+			properties: ['openDirectory', 'multiSelections']
+		});
+
+		if (dirs !== undefined) {
+			dirs.forEach(function(dir, index) {
+				if ($scope.dirs.indexOf(dir) === -1) {
+					$scope.dirs.push(dir);
+				}
+
+				if (index === (dirs.length -1)){
+					localStorage.setItem("dirs", JSON.stringify($scope.dirs))
+				}
+			})
+		}
+	}
+
+	$scope.deleteFolder = function(dir){
+		var index = $scope.dirs.indexOf(dir);
+
+		$scope.dirs.splice(index, 1);
+
+		localStorage.setItem("dirs", JSON.stringify($scope.dirs));
 	}
 
 	$scope.playSong = function(index, path, title, artist, img, time){
@@ -280,28 +364,43 @@ app.controller("MainCtrl", function($scope, $timeout, $filter, $translate) {
 
 		var checkFile = false;
 
-		var files = fs.readdirSync(music_path[0]);
+		$scope.dirs.forEach(function(dir){
+			var files = fs.readdirSync(dir);
 
-		files.forEach(function(item) {
-			if (path === music_path[0] + "/" + encodeURIComponent(item)){
-				console.log("ok")
-				checkFile = true;
-			}
+			files.forEach(function(item) {
+				if (path === dir + "/" + encodeURIComponent(item)){
+					console.log("ok")
+					checkFile = true;
+				}
+			})
 		})
 
-		// if (checkFile) {
+		if (checkFile) {
 			if ($scope.shuffle === "true" && list_random.length === 0) {
 				list_random.push(index);
 			}
-			
+
 			$scope.track_title = title;
 			$scope.track_artist = artist;
 
 			if (img && img.APIC) {
 				$scope.cover = bufferToBase64(img.APIC[0].data);
 				$scope.showCover = true;
+
+				if (win.isMinimized()) {
+					new Notification("S.A.P - Simple Audio Player", {
+						body: title + "\nby " + artist,
+						icon: bufferToBase64(img.APIC[0].data)
+					})
+				}
 			}else {
 				$scope.showCover = false;
+
+				if (win.isMinimized()) {
+					new Notification("S.A.P - Simple Audio Player", {
+						body: title + "\nby " + artist
+					})
+				}
 			}
 
 			playAudio(path.toString(), ($('#volume-duration').slider("option").value / 100));
@@ -320,12 +419,12 @@ app.controller("MainCtrl", function($scope, $timeout, $filter, $translate) {
 			if ($scope.durationTo.indexOf(":") === 1){
 				$scope.durationTo = "0" + $scope.durationTo;
 			}
-		// }else {
-		// 	$scope.pause();
-		// 	$(".cover").removeClass("spinning");
-		// 	$("#audio-player")[0].currentTime = 0;
-		// 	$scope.count = 1;
-		// }
+		}else {
+			$scope.pause();
+			$(".cover").removeClass("spinning");
+			$("#audio-player")[0].currentTime = 0;
+			$scope.count = 1;
+		}
 	}
 
 	$scope.nextSong =function(isLoop, isShuffle) {
@@ -431,7 +530,7 @@ app.controller("MainCtrl", function($scope, $timeout, $filter, $translate) {
 		}else {
 			myMedia.removeAttribute("loop");
 		}
-		
+
 		$scope.loop = $scope.loops[index+1];
 
 
@@ -474,7 +573,7 @@ app.controller("MainCtrl", function($scope, $timeout, $filter, $translate) {
 			}
 		}, 0);
 	});
-	
+
 	$scope.random = function(){
 		do {
 
@@ -545,7 +644,7 @@ app.controller("MainCtrl", function($scope, $timeout, $filter, $translate) {
 	}
 
 	$scope.initLocale= function(){
-		$scope.locales = localStorage.getItem("lang");
+		$scope.locale = localStorage.getItem("lang");
 	}
 
 	$scope.changeLang = function(key){
@@ -555,7 +654,48 @@ app.controller("MainCtrl", function($scope, $timeout, $filter, $translate) {
 		init_menu_bar();
 	}
 
+	$scope.initTheme= function(){
+		$scope.theme = localStorage.getItem("theme");
 
+		$scope.changeTheme($scope.theme);
+	}
+
+	$scope.changeTheme = function(key){
+		console.log(key);
+
+		localStorage.setItem("theme", key);
+
+		switch (key) {
+			case "light": {
+				$timeout(function() {
+					$(".themeDark").addClass("themeLight");
+					$(".themeDark").removeClass("themeDark");
+
+					$(".themeDark-pear").addClass("themeLight-pear");
+					$(".themeDark-foot").addClass("themeLight-foot");
+
+					$(".themeDark-pear").removeClass("themeDark-pear");
+					$(".themeDark-foot").removeClass("themeDark-foot");
+				}, 0);
+
+				break;
+			}
+			case "dark": {
+				$timeout(function() {
+					$(".themeLight").addClass("themeDark");
+					$(".themeLight").removeClass("themeLight");
+
+					$(".themeLight-pear").addClass("themeDark-pear");
+					$(".themeLight-foot").addClass("themeDark-foot");
+
+					$(".themeLight-pear").removeClass("themeLight-pear");
+					$(".themeLight-foot").removeClass("themeLight-foot");
+				}, 0);
+
+				break;
+			}
+		}
+	}
 
 	function bufferToBase64(buf) {
 	    var binstr = Array.prototype.map.call(buf, function (ch) {

@@ -18,35 +18,52 @@
 	<script>if (window.module) module = window.module;</script>
 </head>
 <body ng-app="myApp" ng-controller="MainCtrl">
-	<div class="main-content">
-		<div class="header-bar">
+	<div class="main-content themeLight">
+		<div class="header-bar themeLight">
 			<!-- <div class="header-left">
 				<h2 style="margin-top: 5px; font-size: 35px;">S.A.P</h2>
 				<p style="margin-top: -15px; font-size: 10px;">Simple Audio Player</p>
 
 				<i class="icon ion-ios-gear" onclick="openNav()"></i>
 			</div> -->
-			<div class="header-center">
+			<div class="header-center themeLight">
 				<!-- Modal -->
 				<div class="modal fade bd-example-modal-sm" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-				  <div class="modal-dialog modal-sm">
-				    <div class="modal-content">
+				  <div class="modal-dialog modal-sm" style="top: calc(50vh - 200px);">
+				    <div class="modal-content themeLight">
 				    	<h2>{{ 'PREFERENCES' | translate}}</h2>
 				    	<div class="item-setting">
-							<div>
+							<!-- <div>
 								<p>Theme:</p>
 								<select class="form-control" ng-model="themes" ng-init="" ng-change="">
 									<option value="dark">Dark</option>
 									<option value="white">White</option>
 								</select>
-							</div>
+							</div> -->
 							<div>
-								<p>Language:</p>
-								<select class="form-control" ng-model="locales" ng-init="initLocale()" ng-change="changeLang(locales)">
-									<option value="en">English</option>
-									<option value="vi">Vietnamese</option>
+								<p>{{'LANGUAGE' | translate}}:</p>
+								<select class="form-control" ng-model="locale" ng-init="initLocale()" ng-change="changeLang(locale)">
+									<option ng-repeat="l in locales | orderBy:'name'" value="{{ l.value }}">{{ l.name }}</option>
 								</select>
 							</div>
+							<div>
+								<p>{{'THEME' | translate}}:</p>
+								<select class="form-control" ng-model="theme" ng-init="initTheme()" ng-change="changeTheme(theme)">
+									<option ng-repeat="t in themes | orderBy:'name'" value="{{ t.value }}">{{ t.name | translate }}</option>
+								</select>
+							</div>
+							<div>
+								<p>{{'FOLDER (S)' | translate}}:</p>
+								<button id="btn-add-folder" ng-click="directoryPicker()">
+								{{'ADD FOLDER (S)' | translate}}
+								</button>
+							</div>
+							<ul id="list-folder">
+								<div ng-repeat="dir in dirs | orderBy">
+									<span>{{ dir }}</span>
+									<i class="icon ion-ios-close-empty" ng-click="deleteFolder(dir)"></i>
+								</div>
+							</ul>
 				    	</div>
 				    </div>
 				  </div>
@@ -81,7 +98,7 @@
 			<div class="tracks-list-body done" style="display: none;">
 				<div class="tracks-list-tiles">
 					<div class="tracks-list-tile">
-						<div id="{{music.id}}" class="track" ng-class="$index % 2 === 0 ? 'track-pear' : 'track-foot' " ng-repeat="music in musics | orderBy: sort" ng-click="playSong( $index, music.path, music.title, music.artist, music['id3v2.3'], music.duration )">
+						<div id="{{music.id}}" class="track" ng-class="theme === 'light' ? ($index % 2 === 0 ? 'themeLight-pear' : 'themeLight-foot') : ($index % 2 === 0 ? 'themeDark-pear' : 'themeDark-foot') " ng-repeat="music in musics | orderBy: sort" ng-click="playSong( $index, music.path, music.title, music.artist, music['id3v2.3'], music.duration )">
 							<div class="cell cell-track-playing text-center">{{ $index + 1 }}</div>
 							<div class="cell cell-track">{{ music.title }}</div>
 							<div class="cell cell-duration">{{ music.duration || '00:00' }}</div>
@@ -92,16 +109,16 @@
 				</div>
 			</div>
 
-			<div class="footer-bar">
+			<div class="footer-bar themeLight">
 				<p class="loading" ="loading">{{ 'LOADING' | translate }}...</p>
 				<p class="done" style="display: none;">{{ total_songs }} {{ total_songs > 1 ?  ('TRACKS' | translate) : ('TRACK' | translate) }}, {{total_time}}</p>
 			</div>
 		</div>
 
-		<div class="info">
+		<div class="info themeLight">
 			<center>
 				<div class="cover" ng-class="current !== undefined ? 'spinning' : ''" ng-show="showCover" style="padding: 0px; animation-play-state: paused;">
-					<img width="250" height="250" src="{{cover}}">
+					<img width="248" height="248" src="{{cover}}">
 				</div>
 
 				<div data-toggle="modal" data-target="#exampleModal" class="cover" ng-class="current !== undefined ? 'spinning' : ''" ng-hide="showCover" style="animation-play-state: paused;">

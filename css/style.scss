@@ -1,16 +1,76 @@
-$white: #FFF;
-
 $header-color: #555;
 $primary-color: #ccc;
 $foot: #444;
 $pear: #4d4d4d;
 $selected: #459ce7;
 
-$dark: #444444;
-$dark-foot: #444;
-$dark-pear: #4d4d4d;
+//Themes
+$white: #FFFFFF;
+$black: #000000;
 
-$light: #f5f5f5;
+$dark: #444444;
+$dark-pear: #4D4D4D;
+$dark-foot: #444444;
+
+$light: #F2F2F2;
+$light-pear: #FFFFFF;
+$light-foot: #F2F2F2;
+$light-sorted: #CCCCCC;
+
+.themeDark {
+	background-color: $dark !important;
+	color: $white !important;
+
+    * {
+    	color: $white;
+    }
+
+    .sorted {
+    	background-color: #888888;
+    }
+
+    .modal-sm .modal-content .item-setting div select, .modal-sm .modal-content .item-setting div select:focus, .modal-sm .modal-content .item-setting div #btn-add-folder {
+    	background-color: $dark !important;
+    	color: $white !important;
+    	border: 1px solid $white !important;
+    }
+
+}
+.themeDark-pear {
+	background-color: $dark-pear;
+	color: $white;
+}
+.themeDark-foot {
+	background-color: $dark-foot;
+	color: $white;
+}
+
+.themeLight {
+	background-color: $light !important;
+    color: $black !important;
+
+    * {
+    	color: $black;
+    }
+
+    .sorted {
+    	background-color: $light-sorted;
+    }
+
+    .modal-sm .modal-content .item-setting div select, .modal-sm .modal-content .item-setting div select:focus, .modal-sm .modal-content .item-setting div #btn-add-folder {
+    	background-color: $light !important;
+    	color: $black !important;
+    	border: 1px solid $light-sorted !important;
+    }
+}
+.themeLight-pear {
+	background-color: $light-pear;
+    color: $black;
+}
+.themeLight-foot {
+	background-color: $light-foot;
+    color: $black;
+}
 
 
 * {
@@ -417,6 +477,7 @@ body {
 					    display: flex;
 					    color: $white;
 					    padding: 5px;
+					    cursor: pointer;
 
 					    .cell {
 						    padding: 4px;
@@ -436,8 +497,10 @@ body {
 					}
 
 					.track.selected {
-					    background-color: #459ce7;
-					    color: #fff;
+					    background-color: #459ce7 !important;
+					     * {
+					     	color: #fff !important;
+					     }
 					}
 				}
 			}
@@ -500,14 +563,54 @@ body {
 				select:focus {
 					border: 1px solid $white !important;	
 				}
+
+				#btn-add-folder {
+					width: 207px;
+					height: 34px;
+					background-color: $dark;
+					border: 1px solid $white;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
+
+				#btn-add-folder:focus {
+					border: 1px solid $white !important;
+				}
+			}
+
+			#list-folder {
+				border: 1px solid;
+				padding: 0px;
+				height: 150px;
+    			overflow-y: auto;
+
+				div {
+					margin: 2.5px 20px !important;
+
+					span {
+						padding-top: 10px;
+						padding-right: 10px;
+						width: 100%;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+					}
+
+					i {
+						color: #f44242;
+						cursor: pointer;
+					}
+				}
 			}
 		}
 	}
 }
 
 ::-webkit-scrollbar {
-  width: 3px;
+  width: 5px;
   height: 14px;
+  -webkit-border-radius: 7px;
 }
 
 ::-webkit-scrollbar-thumb {
