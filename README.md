@@ -1,7 +1,7 @@
 # S.A.P
 S.A.P - Simple Audio Player
 
-## Screenshot
+## Screenshots
 ![Screenshotfrom2017-03-2414-12-18.png](http://sv1.upsieutoc.com/2017/03/24/Screenshotfrom2017-03-2414-12-18.md.png)
 ![Screenshotfrom2017-03-2414-13-00.png](http://sv1.upsieutoc.com/2017/03/24/Screenshotfrom2017-03-2414-13-00.md.png)
 ![Screenshotfrom2017-03-2414-12-34.png](http://sv1.upsieutoc.com/2017/03/24/Screenshotfrom2017-03-2414-12-34.md.png)
