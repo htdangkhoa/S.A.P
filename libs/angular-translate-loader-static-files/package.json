@@ -54,7 +54,7 @@
     "url": "https://github.com/angular-translate/angular-translate/issues"
   },
   "dependencies": {
-    "angular-translate": "~2.15.0"
+    "angular-translate": "~2.18.1"
   },
   "description": "Creates a loading function for a typical static file url pattern: \"lang-en_US.json\", \"lang-de_DE.json\", etc. Using this builder, the response of these urls must be an object of key-value pairs.",
   "devDependencies": {},
