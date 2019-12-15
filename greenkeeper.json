@@ -1,0 +1,14 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "libs/angular-translate-loader-static-files/package.json",
+        "libs/angular-translate/package.json",
+        "libs/bootstrap/package.json",
+        "libs/jquery-ui/package.json",
+        "libs/jquery/package.json",
+        "package.json"
+      ]
+    }
+  }
+}
