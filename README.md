@@ -1,4 +1,7 @@
 # S.A.P
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/htdangkhoa/S.A.P.svg)](https://greenkeeper.io/)
+
 S.A.P - Simple Audio Player
 
 ## Screenshots
